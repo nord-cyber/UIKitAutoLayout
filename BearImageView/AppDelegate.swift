@@ -13,15 +13,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
-//        let window = UIWindow()
-//        window.makeKeyAndVisible()
-//        let layout = UICollectionViewLayout()
-//        let collectionVC = CollectionViewController(collectionViewLayout: layout)
-//     
-//        window.rootViewController = collectionVC
-     
-        
+    
         return true
     }
 

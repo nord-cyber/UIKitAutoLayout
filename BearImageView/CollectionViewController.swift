@@ -16,10 +16,9 @@ extension UIColor {
 
 class CollectionViewController: UICollectionViewController {
     
+    let pages = Page.pages
     
     
-    
-    var arrayWithElementsPage:[Page] = [Page(imageName: "bear_image", headerText: "Joint to us chat!", bodyText: "Here we have fun communication and games!"), Page(imageName: "bear_image", headerText: "Use this chance!", bodyText: "When you click on this button you deep in crazy world!"), Page(imageName: "bear_image", headerText: "Do it!", bodyText: "You always cancel all changes in your card!")]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,18 +27,20 @@ class CollectionViewController: UICollectionViewController {
         self.collectionView!.register(PageCell.self, forCellWithReuseIdentifier: reuseIdentifier)
         setupBarButtons()
         collectionView.backgroundColor = .white
+        collectionView.isPagingEnabled = true
     }
 
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return arrayWithElementsPage.count
+        return pages.count
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! PageCell
         
-        cell.page = arrayWithElementsPage[indexPath.item]
+        let pages = self.pages
+        cell.page = pages[indexPath.item]
         return cell
     }
     
@@ -53,6 +54,7 @@ class CollectionViewController: UICollectionViewController {
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         button.setTitleColor(.pinkColor, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(handlePrevPageButton), for: .touchUpInside)
         return button
     }()
     
@@ -61,14 +63,31 @@ class CollectionViewController: UICollectionViewController {
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         button.setTitleColor(.pinkColor, for: .normal)
         button.setTitle("NEXT", for: .normal)
+        button.addTarget(self, action: #selector(handleNextPageButton), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    private var pageControl:UIPageControl = {
+    @objc private func handleNextPageButton() {
+        
+        let item = min(pageControl.currentPage + 1, pages.count - 1) // сопостовление двух чисел
+        let indexPath = IndexPath(item: item, section: 0)
+        pageControl.currentPage = item
+        collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredHorizontally)
+    }
+    
+    @objc private func handlePrevPageButton() {
+         
+        let item = max(pageControl.currentPage - 1, 0)
+        let indexPath = IndexPath(item: item, section: 0)
+        pageControl.currentPage = item
+        collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .centeredHorizontally)
+    }
+    
+    private lazy var pageControl:UIPageControl = {
         let page = UIPageControl()
         page.currentPage = 0
-        page.numberOfPages = 4
+        page.numberOfPages = pages.count
         page.currentPageIndicatorTintColor = .red
         page.pageIndicatorTintColor = .pinkColorLight
         return page
@@ -78,7 +97,7 @@ class CollectionViewController: UICollectionViewController {
         
         let stackViewBarButtons = UIStackView(arrangedSubviews: [previousButton,pageControl,nextButton])
         
-        stackViewBarButtons.distribution = .fillEqually
+        stackViewBarButtons.distribution = .fillProportionally
         stackViewBarButtons.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(stackViewBarButtons)
         
@@ -105,6 +124,13 @@ extension CollectionViewController:UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: view.frame.width, height: view.frame.height)
+    }
+    
+    // for swipe in controller
+    override func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        
+        let x = targetContentOffset.pointee.x
+        pageControl.currentPage = Int(x / view.frame.width) // = 1..2..3..4..5
     }
 }
 

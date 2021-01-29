@@ -17,7 +17,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let _ = (scene as? UIWindowScene) else { return }
         
         
-       //let window = UIWindow()
+       
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         let collectionVC = CollectionViewController(collectionViewLayout: layout)
